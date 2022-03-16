@@ -16,15 +16,15 @@ sudo apt-get update -y && sudo apt-get upgrade -y
 
 # Install apache2 packages.
 echo -e "\n\nInstalling Apache2 Packages\n"
-sudo apt-get install apache2 apache2-mpm-prefork -y
+sudo apt-get install apache2 -y
 sudo ufw allow in "Apache" -y
 sudo a2enmod rewrite
 # sudo sed "$(grep -n "AllowOverride None" input.file |cut -f1 -d:)s/.*/AllowOverride All/" input.file > output.file
 
 # Install MySQL database server
-export DEBIAN_FRONTEND="noninteractive"
-debconf-set-selections <<< "mysql-server mysql-server/root_password password $db_root_password"
-debconf-set-selections <<< "mysql-server mysql-server/root_password_again password $db_root_password"
+# export DEBIAN_FRONTEND="noninteractive"
+# debconf-set-selections <<< "mysql-server mysql-server/root_password password $db_root_password"
+# debconf-set-selections <<< "mysql-server mysql-server/root_password_again password $db_root_password"
 sudo apt update
 sudo apt-get install mysql-server mysql-client -y
 sudo mysql_secure_installation -y
