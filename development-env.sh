@@ -43,6 +43,35 @@ sudo systemctl restart apache2
 ## Configure PhpMyAdmin
 echo 'Include /etc/phpmyadmin/apache.conf' >> /etc/apache2/apache2.conf
 
+# Give a www-data permission to www directory
 echo -e "\n\nPermissions for /var/www\n"
 sudo chown -R www-data:www-data /var/www
 echo -e "\n\n Permissions have been set\n"
+
+# Install Zip, Unzip, Git
+echo -e "\n\nInstalling Git, Zip, and Unzip\n"
+sudo apt update
+sudo apt install zip unzip git
+
+# Install composer
+echo -e "\n\nInstalling Composer\n"
+sudo apt update
+php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+php -r "if (hash_file('sha384', 'composer-setup.php') === '906a84df04cea2aa72f40b5f787e49f22d4c2f19492ac310e8cba5b96ac8b64115ac402c8cd292b8a03482574915d1a8') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
+php composer-setup.php --version=1.10.25
+php -r "unlink('composer-setup.php');"
+sudo mv composer.phar /usr/local/bin/composer
+
+# Install Dukto
+echo -e "\n\nInstalling Dukto\n"
+sudo add-apt-repository ppa:xuzhen666/dukto
+sudo apt update
+sudo apt install dukto
+
+# Install Brave
+echo -e "\n\nInstalling Brave\n"
+sudo apt install apt-transport-https curl
+sudo curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg arch=amd64] https://brave-browser-apt-release.s3.brave.com/ stable main"|sudo tee /etc/apt/sources.list.d/brave-browser-release.list
+sudo apt update
+sudo apt install brave-browser
