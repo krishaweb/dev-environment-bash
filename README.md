@@ -1,2 +1,10 @@
-# ubuntu-dev-environment-
-Shall script to download LAMP and required packages
+# Development Environment for the ubuntu system
+
+## Packages include
+- LAMP
+- Git
+- Zip
+- Unzip
+- Composer
+- Brave
+- Dukto
