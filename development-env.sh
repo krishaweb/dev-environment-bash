@@ -26,8 +26,14 @@ sudo a2enmod rewrite
 # debconf-set-selections <<< "mysql-server mysql-server/root_password password $db_root_password"
 # debconf-set-selections <<< "mysql-server mysql-server/root_password_again password $db_root_password"
 sudo apt update
-sudo apt-get install mysql-server mysql-client -y
-sudo mysql_secure_installation -y
+sudo apt install wget -y
+wget https://dev.mysql.com/get/mysql-apt-config_0.8.12-1_all.deb
+sudo dpkg -i mysql-apt-config_0.8.12-1_all.deb
+sudo apt-get update
+sudo apt-cache policy mysql-server
+sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 467B942D3A79BD29
+sudo apt install -f mysql-client=5.7* mysql-community-server=5.7* mysql-server=5.7*
+sudo mysql_secure_installation
 
 # Install PHP packages.
 echo -e "\n\nInstalling PHP & Requirements\n"
