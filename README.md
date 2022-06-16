@@ -8,9 +8,13 @@
 - To run shell script file:
 
   ```./script-name-here.sh```
+
   Another option:
+
   ```sh script-name-here.sh```
+
   OR
+
   ```bash script-name-here.sh```
 
 ## Packages include
