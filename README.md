@@ -6,6 +6,7 @@
 - Set execute permission using chmod command if the file is not executable.
   'chmod +x script-name-here.sh'
 - To run shell script file:
+
   ```./script-name-here.sh```
   Another option:
   ```sh script-name-here.sh```
