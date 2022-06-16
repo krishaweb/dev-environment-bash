@@ -49,10 +49,17 @@ sudo systemctl restart apache2
 ## Configure PhpMyAdmin
 echo 'Include /etc/phpmyadmin/apache.conf' >> /etc/apache2/apache2.conf
 
-# Give a www-data permission to www directory
-echo -e "\n\nPermissions for /var/www\n"
+# Give a www-data ownership to www directory
+echo -e "\n\n Ownership for /var/www\n"
 sudo chown -R www-data:www-data /var/www
+echo -e "\n\n Ownership have been set\n"
+
+# Give a write permission to www directory
+echo -e "\n\nPermissions for /var/www\n"
+sudo chmod 777 /var/www
 echo -e "\n\n Permissions have been set\n"
+
+
 
 # Install Zip, Unzip, Git
 echo -e "\n\nInstalling Git, Zip, and Unzip\n"
