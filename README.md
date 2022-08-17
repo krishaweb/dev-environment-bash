@@ -19,9 +19,15 @@
 
 ## Packages include
 - LAMP
+- Docker
+- Node & NPM
 - Git
 - Zip
 - Unzip
 - Composer
 - Brave
 - Dukto
+- FileZilla
+- Sublime editor
+- Visual studio editor
+- PHPCS
