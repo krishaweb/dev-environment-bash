@@ -21,7 +21,7 @@ sudo ufw allow in "Apache" -y
 sudo a2enmod rewrite
 # sudo sed "$(grep -n "AllowOverride None" input.file |cut -f1 -d:)s/.*/AllowOverride All/" input.file > output.file
 
-# Install MySQL database server
+# Install MySQL-5.7 database & mysql-server
 # export DEBIAN_FRONTEND="noninteractive"
 # debconf-set-selections <<< "mysql-server mysql-server/root_password password $db_root_password"
 # debconf-set-selections <<< "mysql-server mysql-server/root_password_again password $db_root_password"
@@ -35,9 +35,16 @@ sudo apt-cache policy mysql-server
 sudo apt install -f mysql-client=5.7* mysql-community-server=5.7* mysql-server=5.7*
 sudo mysql_secure_installation
 
+# Install MySQL-8.0.27 database & mysql-server
+# sudo apt update
+# sudo apt install mysql-server -y
+# sudo systemctl start mysql.service
+# sudo mysql_secure_installation
+
 # Install PHP packages.
 echo -e "\n\nInstalling PHP & Requirements\n"
 sudo apt-get install php libapache2-mod-php php-mysql -y
+# sudo apt install php7.4 php7.4-common php7.4-fpm libapache2-mod-php7.4 php7.4-intl php7.4-zip php7.4-curl php7.4-gd php7.4-json php7.4-gmp php7.4-pgsql php7.4-xml php7.4-cgi php7.4-dev php7.4-imap php7.4-mbstring php7.4-soap php7.4-cli php7.4-interbase php7.4-mysql libapache2-mod-fcgid
 
 ## Install PhpMyAdmin
 echo -e "\n\nInstalling phpmyadmin\n"
@@ -59,8 +66,6 @@ echo -e "\n\nPermissions for /var/www\n"
 sudo chmod 777 /var/www
 echo -e "\n\n Permissions have been set\n"
 
-
-
 # Install Zip, Unzip, Git
 echo -e "\n\nInstalling Git, Zip, and Unzip\n"
 sudo apt update
@@ -71,9 +76,37 @@ echo -e "\n\nInstalling Composer\n"
 sudo apt update
 php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
 php -r "if (hash_file('sha384', 'composer-setup.php') === '906a84df04cea2aa72f40b5f787e49f22d4c2f19492ac310e8cba5b96ac8b64115ac402c8cd292b8a03482574915d1a8') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
-php composer-setup.php --version=1.10.25
-php -r "unlink('composer-setup.php');"
+php composer-setup.php --version=1.10.26
 sudo mv composer.phar /usr/local/bin/composer
+
+# Install nodejs-16 as a user
+echo -e "\n\nInstalling nodejs 14\n"
+sudo apt update
+curl -sL https://deb.nodesource.com/setup_16.x -o /tmp/nodesource_setup.sh
+sudo apt install nodejs
+node -v
+echo 'export PATH=$HOME/local/bin:$PATH' >> ~/.bashrc
+source ~/.bashrc
+sudo chown -R $(whoami) ~/.npm
+sudo chown -R $(whoami) /usr/lib/node_modules
+
+# Install docker 
+echo -e "\n\nInstalling docker 14\n"
+sudo apt-get update
+sudo apt-get install ca-certificates curl gnupg lsb-release
+sudo mkdir -p /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
+apt-cache madison docker-ce
+sudo apt-get install docker-ce=5:20.10.17~3-0~ubuntu-focal docker-ce-cli=5:20.10.17~3-0~ubuntu-focal containerd.io docker-compose-plugin
+sudo groupadd docker
+sudo usermod -aG docker $USER
+sudo chown "$USER":"$USER" /home/"$USER"/.docker -R
+sudo chmod g+rwx "$HOME/.docker" -R
 
 # Install Dukto
 echo -e "\n\nInstalling Dukto\n"
@@ -84,7 +117,7 @@ sudo apt install dukto
 # Install Brave
 echo -e "\n\nInstalling Brave\n"
 sudo apt install apt-transport-https curl
-sudo curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
+curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
 echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg arch=amd64] https://brave-browser-apt-release.s3.brave.com/ stable main"|sudo tee /etc/apt/sources.list.d/brave-browser-release.list
 sudo apt update
 sudo apt install brave-browser
@@ -95,3 +128,26 @@ sudo apt update
 wget -q https://packages.microsoft.com/keys/microsoft.asc -O- | sudo apt-key add -
 sudo add-apt-repository "deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main"
 sudo apt install code
+
+# Install Sublime Text editor 3
+echo -e "\n\nInstalling Sublime Text Editor\n"
+sudo apt update
+curl -fsSL https://download.sublimetext.com/sublimehq-pub.gpg | sudo apt-key add -
+sudo add-apt-repository "deb https://download.sublimetext.com/ apt/stable/"
+sudo apt update
+sudo apt install sublime-text
+
+# Install FileZilla
+echo -e "\n\nInstalling Sublime Text Editor\n"
+sudo apt update
+sudo apt install filezilla
+
+# Install PHP_CodeSniffer
+echo -e "\n\nInstalling PHP_CodeSniffer\n"
+composer global require "squizlabs/php_codesniffer=*"
+# first check if you already have composer's vendor bin directory as part of your path:
+echo $PATH
+set PATH $PATH $HOME/.config/composer/vendor/bin
+# and then check the PATH once again:
+echo $PATH
+phpcs -i
