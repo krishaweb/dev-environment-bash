@@ -77,24 +77,18 @@ sudo apt update
 php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
 php -r "if (hash_file('sha384', 'composer-setup.php') === '906a84df04cea2aa72f40b5f787e49f22d4c2f19492ac310e8cba5b96ac8b64115ac402c8cd292b8a03482574915d1a8') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
 php composer-setup.php --version=1.10.26
-php -r "unlink('composer-setup.php');"
 sudo mv composer.phar /usr/local/bin/composer
 
-# Install nodejs-14 as a user
+# Install nodejs-16 as a user
 echo -e "\n\nInstalling nodejs 14\n"
 sudo apt update
-curl -sL https://deb.nodesource.com/setup_14.x -o /tmp/nodesource_setup.sh
-nano /tmp/nodesource_setup.sh
-sudo bash /tmp/nodesource_setup.sh
+curl -sL https://deb.nodesource.com/setup_16.x -o /tmp/nodesource_setup.sh
 sudo apt install nodejs
-sudo apt install npm
 node -v
 echo 'export PATH=$HOME/local/bin:$PATH' >> ~/.bashrc
 source ~/.bashrc
 sudo chown -R $(whoami) ~/.npm
-sudo chown -R $USER /usr/local/lib/node_modules
-npm config set prefix "${HOME}/npm"
-export PATH="${PATH}:${HOME}/npm/bin"
+sudo chown -R $(whoami) /usr/lib/node_modules
 
 # Install docker 
 echo -e "\n\nInstalling docker 14\n"
@@ -108,8 +102,7 @@ echo \
 sudo apt-get update
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
 apt-cache madison docker-ce
-sudo apt-get install docker-ce=5:20.10.16~3-0~ubuntu-jammy docker-ce-cli=5:20.10.16~3-0~ubuntu-jammy containerd.io docker-compose-plugin
-newgrp docker
+sudo apt-get install docker-ce=5:20.10.17~3-0~ubuntu-focal docker-ce-cli=5:20.10.17~3-0~ubuntu-focal containerd.io docker-compose-plugin
 sudo groupadd docker
 sudo usermod -aG docker $USER
 sudo chown "$USER":"$USER" /home/"$USER"/.docker -R
@@ -152,4 +145,9 @@ sudo apt install filezilla
 # Install PHP_CodeSniffer
 echo -e "\n\nInstalling PHP_CodeSniffer\n"
 composer global require "squizlabs/php_codesniffer=*"
+# first check if you already have composer's vendor bin directory as part of your path:
+echo $PATH
+set PATH $PATH $HOME/.config/composer/vendor/bin
+# and then check the PATH once again:
+echo $PATH
 phpcs -i
