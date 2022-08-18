@@ -19,6 +19,8 @@ echo -e "\n\nInstalling Apache2 Packages\n"
 sudo apt-get install apache2 -y
 sudo ufw allow in "Apache" -y
 sudo a2enmod rewrite
+sudo sed -i 's+DocumentRoot /var/www/html+DocumentRoot /var/www+g' /etc/apache2/sites-available/000-default.conf
+sudo sed -z 's|<Directory /var/www/>\n\tOptions Indexes FollowSymLinks\n\tAllowOverride None|<Directory /var/www/>\n\tOptions Indexes FollowSymLinks\n\tAllowOverride All|' -i /etc/apache2/apache2.conf
 # sudo sed "$(grep -n "AllowOverride None" input.file |cut -f1 -d:)s/.*/AllowOverride All/" input.file > output.file
 
 # Install MySQL-5.7 database & mysql-server
@@ -58,7 +60,7 @@ echo 'Include /etc/phpmyadmin/apache.conf' >> /etc/apache2/apache2.conf
 
 # Give a www-data ownership to www directory
 echo -e "\n\n Ownership for /var/www\n"
-sudo chown -R www-data:www-data /var/www
+sudo chown -R $USER:$USER /var/www
 echo -e "\n\n Ownership have been set\n"
 
 # Give a write permission to www directory
@@ -87,8 +89,7 @@ sudo apt install nodejs
 node -v
 echo 'export PATH=$HOME/local/bin:$PATH' >> ~/.bashrc
 source ~/.bashrc
-sudo chown -R $(whoami) ~/.npm
-sudo chown -R $(whoami) /usr/lib/node_modules
+sudo chown -R $(whoami) ~/.npm /usr/local/lib/nodejs/bin/npm
 
 # Install docker 
 echo -e "\n\nInstalling docker 14\n"
