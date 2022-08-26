@@ -152,3 +152,26 @@ set PATH $PATH $HOME/.config/composer/vendor/bin
 # and then check the PATH once again:
 echo $PATH
 phpcs -i
+
+install_wpcli() {
+  curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+  php wp-cli.phar --info
+  chmod +x wp-cli.phar
+  sudo mv wp-cli.phar /usr/local/bin/wp
+  wp --info
+  echo "\e[1;42m WP CLI install successfully \e[0m"
+}
+
+while true; do
+
+read -p "Do you want to install WP CLI for WordPress (y/n) " yn
+
+case $yn in
+  [yY] )
+    install_wpcli
+    break;;
+  [nN] ) echo "\e[1;41m No \e[0m"
+    exit;;
+esac
+
+done
