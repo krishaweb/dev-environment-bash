@@ -60,7 +60,7 @@ echo 'Include /etc/phpmyadmin/apache.conf' >> /etc/apache2/apache2.conf
 
 # Give a www-data ownership to www directory
 echo -e "\n\n Ownership for /var/www\n"
-sudo chown -R $USER:$USER /var/www
+sudo chown -R $(whoami):$(whoami) /var/www
 echo -e "\n\n Ownership have been set\n"
 
 # Give a write permission to www directory
@@ -77,19 +77,20 @@ sudo apt install zip unzip git
 echo -e "\n\nInstalling Composer\n"
 sudo apt update
 php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-php -r "if (hash_file('sha384', 'composer-setup.php') === '906a84df04cea2aa72f40b5f787e49f22d4c2f19492ac310e8cba5b96ac8b64115ac402c8cd292b8a03482574915d1a8') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
+php -r "if (hash_file('sha384', 'composer-setup.php') === '55ce33d7678c5a611085589f1f3ddf8b3c52d662cd01d4ba75c0ee0459970c2200a51f492d557530c71c15d8dba01eae') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
 php composer-setup.php --version=1.10.26
 sudo mv composer.phar /usr/local/bin/composer
 
 # Install nodejs-16 as a user
 echo -e "\n\nInstalling nodejs 14\n"
 sudo apt update
-curl -sL https://deb.nodesource.com/setup_16.x -o /tmp/nodesource_setup.sh
+curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash -
 sudo apt install nodejs
 node -v
+sudo apt install build-essential
 echo 'export PATH=$HOME/local/bin:$PATH' >> ~/.bashrc
 source ~/.bashrc
-sudo chown -R $(whoami) ~/.npm /usr/local/lib/nodejs/bin/npm
+sudo chown -R $(whoami) /usr/local/lib/nodejs/bin/npm
 
 # Install docker 
 echo -e "\n\nInstalling docker 14\n"
@@ -105,8 +106,8 @@ sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
 apt-cache madison docker-ce
 sudo apt-get install docker-ce=5:20.10.17~3-0~ubuntu-focal docker-ce-cli=5:20.10.17~3-0~ubuntu-focal containerd.io docker-compose-plugin
 sudo groupadd docker
-sudo usermod -aG docker $USER
-sudo chown "$USER":"$USER" /home/"$USER"/.docker -R
+sudo usermod -aG docker $(whoami)
+sudo chown "$(whoami)":"$(whoami)" /home/"$(whoami)"/.docker -R
 sudo chmod g+rwx "$HOME/.docker" -R
 
 # Install Dukto
@@ -147,31 +148,29 @@ sudo apt install filezilla
 echo -e "\n\nInstalling PHP_CodeSniffer\n"
 composer global require "squizlabs/php_codesniffer=*"
 # first check if you already have composer's vendor bin directory as part of your path:
-echo $PATH
-set PATH $PATH $HOME/.config/composer/vendor/bin
-# and then check the PATH once again:
-echo $PATH
+echo 'export PATH=$HOME/.config/composer/vendor/bin:$PATH' >> ~/.bashrc
+source ~/.bashrc
 phpcs -i
 
-install_wpcli() {
-  curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
-  php wp-cli.phar --info
-  chmod +x wp-cli.phar
-  sudo mv wp-cli.phar /usr/local/bin/wp
-  wp --info
-  echo "\e[1;42m WP CLI install successfully \e[0m"
-}
+# install_wpcli() {
+#   curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+#   php wp-cli.phar --info
+#   chmod +x wp-cli.phar
+#   sudo mv wp-cli.phar /usr/local/bin/wp
+#   wp --info
+#   echo "\e[1;42m WP CLI install successfully \e[0m"
+# }
 
-while true; do
+# while true; do
 
-read -p "Do you want to install WP CLI for WordPress (y/n) " yn
+# read -p "Do you want to install WP CLI for WordPress (y/n) " yn
 
-case $yn in
-  [yY] )
-    install_wpcli
-    break;;
-  [nN] ) echo "\e[1;41m No \e[0m"
-    exit;;
-esac
+# case $yn in
+#   [yY] )
+#     install_wpcli
+#     break;;
+#   [nN] ) echo "\e[1;41m No \e[0m"
+#     exit;;
+# esac
 
-done
+# done
