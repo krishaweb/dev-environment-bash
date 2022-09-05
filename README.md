@@ -19,6 +19,8 @@
 
 ## Packages include
 - LAMP
+- phpMyAdmin
+- MySQL Workbench
 - Docker
 - Node & NPM
 - Git
