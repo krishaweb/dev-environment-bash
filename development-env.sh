@@ -48,15 +48,54 @@ echo -e "\n\nInstalling PHP & Requirements\n"
 sudo apt-get install php libapache2-mod-php php-mysql -y
 # sudo apt install php7.4 php7.4-common php7.4-fpm libapache2-mod-php7.4 php7.4-intl php7.4-zip php7.4-curl php7.4-gd php7.4-json php7.4-gmp php7.4-pgsql php7.4-xml php7.4-cgi php7.4-dev php7.4-imap php7.4-mbstring php7.4-soap php7.4-cli php7.4-interbase php7.4-mysql libapache2-mod-fcgid
 
-## Install PhpMyAdmin
+## Install Latest PhpMyAdmin
 echo -e "\n\nInstalling phpmyadmin\n"
 sudo apt update
 sudo apt install phpmyadmin php-mbstring php-zip php-gd php-json php-curl -y
 sudo phpenmod mbstring
 sudo systemctl restart apache2
 
+## Install PhpMyAdmin v4.9.10
+# echo -e "\n\nInstalling phpmyadmin\n"
+# wget https://files.phpmyadmin.net/phpMyAdmin/4.9.10/phpMyAdmin-4.9.10-all-languages.zip
+# unzip phpMyAdmin-4.9.10-all-languages.zip
+# sudo mv phpMyAdmin-4.9.10-all-languages /usr/share/phpmyadmin
+# # set the proper permissions
+# sudo mkdir /usr/share/phpmyadmin/tmp
+# sudo chown -R www-data:www-data /usr/share/phpmyadmin
+# sudo chmod 777 /usr/share/phpmyadmin/tmp
+# touch /etc/apache2/conf-available/phpmyadmin.conf
+# echo "
+# Alias /phpmyadmin /usr/share/phpmyadmin
+# Alias /phpMyAdmin /usr/share/phpmyadmin
+ 
+# <Directory /usr/share/phpmyadmin/>
+#    AddDefaultCharset UTF-8
+#    <IfModule mod_authz_core.c>
+#       <RequireAny>
+#       Require all granted
+#      </RequireAny>
+#    </IfModule>
+# </Directory>
+ 
+# <Directory /usr/share/phpmyadmin/setup/>
+#    <IfModule mod_authz_core.c>
+#      <RequireAny>
+#        Require all granted
+#      </RequireAny>
+#    </IfModule>
+# </Directory>" > phpmyadmin.conf
+# sudo mv phpmyadmin.conf /etc/apache2/conf-available
+# sudo a2enconf phpmyadmin
+# sudo systemctl restart apache2
+
 ## Configure PhpMyAdmin
 echo 'Include /etc/phpmyadmin/apache.conf' >> /etc/apache2/apache2.conf
+
+## Install MySql workbench.
+# echo -e "\n\nInstalling workbench\n"
+# sudo apt update
+# sudo snap install mysql-workbench-community
 
 # Give a www-data ownership to www directory
 echo -e "\n\n Ownership for /var/www\n"
