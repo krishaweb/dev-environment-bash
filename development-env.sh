@@ -129,6 +129,7 @@ node -v
 sudo apt install build-essential
 echo 'export PATH=$HOME/local/bin:$PATH' >> ~/.bashrc
 source ~/.bashrc
+sudo apt install npm
 sudo chown -R $(whoami) /usr/local/lib/nodejs/bin/npm
 
 # Install docker 
