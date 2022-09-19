@@ -33,3 +33,6 @@
 - Sublime editor
 - Visual studio editor
 - PHPCS
+
+## License
+[MIT](https://github.com/krishaweb/dev-environment-bash/blob/main/LICENSE)
