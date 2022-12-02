@@ -70,11 +70,11 @@ sudo apt install phpmyadmin php-mbstring php-zip php-gd php-json php-curl -y
 sudo phpenmod mbstring
 sudo systemctl restart apache2
 
-## Install PhpMyAdmin v4.9.10
+## Install PhpMyAdmin v5.1.4
 # echo -e "\n\nInstalling phpmyadmin\n"
-# wget https://files.phpmyadmin.net/phpMyAdmin/4.9.10/phpMyAdmin-4.9.10-all-languages.zip
-# unzip phpMyAdmin-4.9.10-all-languages.zip
-# sudo mv phpMyAdmin-4.9.10-all-languages /usr/share/phpmyadmin
+# wget https://files.phpmyadmin.net/phpMyAdmin/5.1.4/phpMyAdmin-5.1.4-all-languages.zip
+# unzip phpMyAdmin-5.1.4-all-languages.zip
+# sudo mv phpMyAdmin-5.1.4-all-languages /usr/share/phpmyadmin
 # # set the proper permissions
 # sudo mkdir /usr/share/phpmyadmin/tmp
 # sudo chown -R www-data:www-data /usr/share/phpmyadmin
