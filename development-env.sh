@@ -6,7 +6,7 @@
 
 # Check if running as root
 if [ "$(id -u)" != "0" ]; then
- echo "This script must be run as root" 1>&2
+ echo "You have to run this script as a root user" 1>&2
  exit 1
 fi
 
@@ -27,26 +27,41 @@ sudo sed -z 's|<Directory /var/www/>\n\tOptions Indexes FollowSymLinks\n\tAllowO
 # export DEBIAN_FRONTEND="noninteractive"
 # debconf-set-selections <<< "mysql-server mysql-server/root_password password $db_root_password"
 # debconf-set-selections <<< "mysql-server mysql-server/root_password_again password $db_root_password"
-sudo apt update
-sudo apt install wget -y
-wget https://dev.mysql.com/get/mysql-apt-config_0.8.12-1_all.deb
-sudo dpkg -i mysql-apt-config_0.8.12-1_all.deb
-sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 467B942D3A79BD29
-sudo apt-get update
-sudo apt-cache policy mysql-server
-sudo apt install -f mysql-client=5.7* mysql-community-server=5.7* mysql-server=5.7*
-sudo mysql_secure_installation
+# sudo apt update
+# sudo apt install wget -y
+# wget https://dev.mysql.com/get/mysql-apt-config_0.8.12-1_all.deb
+# sudo dpkg -i mysql-apt-config_0.8.12-1_all.deb
+# sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 467B942D3A79BD29
+# sudo apt-get update
+# sudo apt-cache policy mysql-server
+# sudo apt install -f mysql-client=5.7* mysql-community-server=5.7* mysql-server=5.7*
+# sudo mysql_secure_installation
 
 # Install MySQL-8.0.27 database & mysql-server
-# sudo apt update
-# sudo apt install mysql-server -y
-# sudo systemctl start mysql.service
-# sudo mysql_secure_installation
+sudo apt update
+sudo apt install mysql-server -y
+sudo systemctl start mysql.service
+sudo mysql_secure_installation
 
 # Install PHP packages.
 echo -e "\n\nInstalling PHP & Requirements\n"
+sudo apt update
 sudo apt-get install php libapache2-mod-php php-mysql -y
-# sudo apt install php7.4 php7.4-common php7.4-fpm libapache2-mod-php7.4 php7.4-intl php7.4-zip php7.4-curl php7.4-gd php7.4-json php7.4-gmp php7.4-pgsql php7.4-xml php7.4-cgi php7.4-dev php7.4-imap php7.4-mbstring php7.4-soap php7.4-cli php7.4-interbase php7.4-mysql libapache2-mod-fcgid
+# sudo apt install php7.4 php7.4-common libapache2-mod-php7.4 php7.4-intl php7.4-zip php7.4-curl php7.4-gd php7.4-gmp php7.4-pgsql php7.4-xml php7.4-dev php7.4-imap php7.4-mbstring php7.4-soap php7.4-mysql libapache2-mod-fcgid
+
+# Install Multiple PHP versions.
+echo -e "\n\nInstalling PHP version 8.0 & 8.1\n"
+sudo apt update
+sudo apt install software-properties-common
+sudo add-apt-repository ppa:ondrej/php
+sudo apt update
+sudo apt install php8.0 php8.0-common libapache2-mod-php8.0 php8.0-intl php8.0-zip php8.0-curl php8.0-gd php8.0-gmp php8.0-pgsql php8.0-xml php8.0-dev php8.0-imap php8.0-mbstring php8.0-soap php8.0-mysql libapache2-mod-fcgid
+sudo apt install php8.1 php8.1-common libapache2-mod-php8.1 php8.1-intl php8.1-zip php8.1-curl php8.1-gd php8.1-gmp php8.1-pgsql php8.1-xml php8.1-dev php8.1-imap php8.1-mbstring php8.1-soap php8.1-mysql libapache2-mod-fcgid
+echo -e "\n\n Switching PHP version from 7.4 to 8.0"
+sudo a2dismod php7.4
+sudo a2enmod php8.0
+sudo systemctl restart apache2
+sudo update-alternatives --config php
 
 ## Install Latest PhpMyAdmin
 echo -e "\n\nInstalling phpmyadmin\n"
@@ -55,11 +70,11 @@ sudo apt install phpmyadmin php-mbstring php-zip php-gd php-json php-curl -y
 sudo phpenmod mbstring
 sudo systemctl restart apache2
 
-## Install PhpMyAdmin v4.9.10
+## Install PhpMyAdmin v5.1.4
 # echo -e "\n\nInstalling phpmyadmin\n"
-# wget https://files.phpmyadmin.net/phpMyAdmin/4.9.10/phpMyAdmin-4.9.10-all-languages.zip
-# unzip phpMyAdmin-4.9.10-all-languages.zip
-# sudo mv phpMyAdmin-4.9.10-all-languages /usr/share/phpmyadmin
+# wget https://files.phpmyadmin.net/phpMyAdmin/5.1.4/phpMyAdmin-5.1.4-all-languages.zip
+# unzip phpMyAdmin-5.1.4-all-languages.zip
+# sudo mv phpMyAdmin-5.1.4-all-languages /usr/share/phpmyadmin
 # # set the proper permissions
 # sudo mkdir /usr/share/phpmyadmin/tmp
 # sudo chown -R www-data:www-data /usr/share/phpmyadmin
