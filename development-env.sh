@@ -11,7 +11,7 @@ if [ "$(id -u)" != "0" ]; then
 fi
 
 # Update packages and upgrade pending packages
-echo -e "\n\nUpdating Apt Packages and upgrading latest patches\n"
+echo -e "\n\nUpdating apt packages and upgrading latest patches\n"
 sudo apt-get update -y && sudo apt-get upgrade -y
 
 # Install apache2 packages.
@@ -21,7 +21,6 @@ sudo ufw allow in "Apache" -y
 sudo a2enmod rewrite
 sudo sed -i 's+DocumentRoot /var/www/html+DocumentRoot /var/www+g' /etc/apache2/sites-available/000-default.conf
 sudo sed -z 's|<Directory /var/www/>\n\tOptions Indexes FollowSymLinks\n\tAllowOverride None|<Directory /var/www/>\n\tOptions Indexes FollowSymLinks\n\tAllowOverride All|' -i /etc/apache2/apache2.conf
-# sudo sed "$(grep -n "AllowOverride None" input.file |cut -f1 -d:)s/.*/AllowOverride All/" input.file > output.file
 
 # Install MySQL-5.7 database & mysql-server
 # export DEBIAN_FRONTEND="noninteractive"
@@ -41,13 +40,17 @@ sudo sed -z 's|<Directory /var/www/>\n\tOptions Indexes FollowSymLinks\n\tAllowO
 sudo apt update
 sudo apt install mysql-server -y
 sudo systemctl start mysql.service
-sudo mysql_secure_installation
+# sudo mysql_secure_installation
+# Please use following command to setup root password.
+# sudo mysql
+# ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'Root@1234';
+# flush privileges;
+# exit;
 
 # Install PHP packages.
 echo -e "\n\nInstalling PHP & Requirements\n"
 sudo apt update
 sudo apt-get install php libapache2-mod-php php-mysql -y
-# sudo apt install php7.4 php7.4-common libapache2-mod-php7.4 php7.4-intl php7.4-zip php7.4-curl php7.4-gd php7.4-gmp php7.4-pgsql php7.4-xml php7.4-dev php7.4-imap php7.4-mbstring php7.4-soap php7.4-mysql libapache2-mod-fcgid
 
 # Install Multiple PHP versions.
 echo -e "\n\nInstalling PHP version 8.0 & 8.1\n"
@@ -55,57 +58,56 @@ sudo apt update
 sudo apt install software-properties-common
 sudo add-apt-repository ppa:ondrej/php
 sudo apt update
-sudo apt install php8.0 php8.0-common libapache2-mod-php8.0 php8.0-intl php8.0-zip php8.0-curl php8.0-gd php8.0-gmp php8.0-pgsql php8.0-xml php8.0-dev php8.0-imap php8.0-mbstring php8.0-soap php8.0-mysql libapache2-mod-fcgid
 sudo apt install php8.1 php8.1-common libapache2-mod-php8.1 php8.1-intl php8.1-zip php8.1-curl php8.1-gd php8.1-gmp php8.1-pgsql php8.1-xml php8.1-dev php8.1-imap php8.1-mbstring php8.1-soap php8.1-mysql libapache2-mod-fcgid
-echo -e "\n\n Switching PHP version from 7.4 to 8.0"
+echo -e "\n\n Switching PHP version from 7.4 to 8.1"
 sudo a2dismod php7.4
-sudo a2enmod php8.0
+sudo a2enmod php8.1
 sudo systemctl restart apache2
 sudo update-alternatives --config php
 
-## Install Latest PhpMyAdmin
+# Install Latest PhpMyAdmin
 echo -e "\n\nInstalling phpmyadmin\n"
 sudo apt update
 sudo apt install phpmyadmin php-mbstring php-zip php-gd php-json php-curl -y
 sudo phpenmod mbstring
 sudo systemctl restart apache2
 
-## Install PhpMyAdmin v5.1.4
-# echo -e "\n\nInstalling phpmyadmin\n"
-# wget https://files.phpmyadmin.net/phpMyAdmin/5.1.4/phpMyAdmin-5.1.4-all-languages.zip
-# unzip phpMyAdmin-5.1.4-all-languages.zip
-# sudo mv phpMyAdmin-5.1.4-all-languages /usr/share/phpmyadmin
-# # set the proper permissions
-# sudo mkdir /usr/share/phpmyadmin/tmp
-# sudo chown -R www-data:www-data /usr/share/phpmyadmin
-# sudo chmod 777 /usr/share/phpmyadmin/tmp
-# touch /etc/apache2/conf-available/phpmyadmin.conf
-# echo "
-# Alias /phpmyadmin /usr/share/phpmyadmin
-# Alias /phpMyAdmin /usr/share/phpmyadmin
+# Install PhpMyAdmin v5.1.4
+echo -e "\n\nInstalling phpmyadmin\n"
+wget https://files.phpmyadmin.net/phpMyAdmin/5.1.4/phpMyAdmin-5.1.4-all-languages.zip
+unzip phpMyAdmin-5.1.4-all-languages.zip
+sudo mv phpMyAdmin-5.1.4-all-languages /usr/share/phpmyadmin
+# set the proper permissions
+sudo mkdir /usr/share/phpmyadmin/tmp
+sudo chown -R www-data:www-data /usr/share/phpmyadmin
+sudo chmod 777 /usr/share/phpmyadmin/tmp
+# sudo touch /etc/apache2/conf-available/phpmyadmin.conf
+echo "
+Alias /phpmyadmin /usr/share/phpmyadmin
+Alias /phpMyAdmin /usr/share/phpmyadmin
  
-# <Directory /usr/share/phpmyadmin/>
-#    AddDefaultCharset UTF-8
-#    <IfModule mod_authz_core.c>
-#       <RequireAny>
-#       Require all granted
-#      </RequireAny>
-#    </IfModule>
-# </Directory>
+<Directory /usr/share/phpmyadmin/>
+   AddDefaultCharset UTF-8
+   <IfModule mod_authz_core.c>
+      <RequireAny>
+      Require all granted
+     </RequireAny>
+   </IfModule>
+</Directory>
  
-# <Directory /usr/share/phpmyadmin/setup/>
-#    <IfModule mod_authz_core.c>
-#      <RequireAny>
-#        Require all granted
-#      </RequireAny>
-#    </IfModule>
-# </Directory>" > phpmyadmin.conf
-# sudo mv phpmyadmin.conf /etc/apache2/conf-available
-# sudo a2enconf phpmyadmin
-# sudo systemctl restart apache2
+<Directory /usr/share/phpmyadmin/setup/>
+   <IfModule mod_authz_core.c>
+     <RequireAny>
+       Require all granted
+     </RequireAny>
+   </IfModule>
+</Directory>" > phpmyadmin.conf
+sudo mv phpmyadmin.conf /etc/apache2/conf-available
+sudo a2enconf phpmyadmin
+sudo systemctl restart apache2
 
 ## Configure PhpMyAdmin
-echo 'Include /etc/phpmyadmin/apache.conf' >> /etc/apache2/apache2.conf
+# echo 'Include /etc/phpmyadmin/apache.conf' >> /etc/apache2/apache2.conf
 
 ## Install MySql workbench.
 # echo -e "\n\nInstalling workbench\n"
@@ -132,7 +134,7 @@ echo -e "\n\nInstalling Composer\n"
 sudo apt update
 php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
 php -r "if (hash_file('sha384', 'composer-setup.php') === '55ce33d7678c5a611085589f1f3ddf8b3c52d662cd01d4ba75c0ee0459970c2200a51f492d557530c71c15d8dba01eae') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
-php composer-setup.php --version=1.10.26
+php composer-setup.php
 sudo mv composer.phar /usr/local/bin/composer
 
 # Install nodejs-16 as a user
