@@ -4,13 +4,13 @@
 # Bash script to install an LAMP stack in ubuntu OS
 # Author: girishpanchal
 
-# Check if running as root
+# Check whether you are running this as a root.
 if [ "$(id -u)" != "0" ]; then
  echo "You have to run this script as a root user" 1>&2
  exit 1
 fi
 
-# Update packages and upgrade pending packages
+# Update packages and upgrade pending packages.
 echo -e "\n\nUpdating apt packages and upgrading latest patches\n"
 sudo apt-get update -y && sudo apt-get upgrade -y
 
@@ -21,6 +21,12 @@ sudo ufw allow in "Apache" -y
 sudo a2enmod rewrite
 sudo sed -i 's+DocumentRoot /var/www/html+DocumentRoot /var/www+g' /etc/apache2/sites-available/000-default.conf
 sudo sed -z 's|<Directory /var/www/>\n\tOptions Indexes FollowSymLinks\n\tAllowOverride None|<Directory /var/www/>\n\tOptions Indexes FollowSymLinks\n\tAllowOverride All|' -i /etc/apache2/apache2.conf
+
+# Install NGINX packages.
+# echo -e "\n\nInstalling NGINX Packages\n"
+# sudo apt update
+# sudo apt install nginx
+# sudo ufw allow 'Nginx HTTP'
 
 # Install MySQL-5.7 database & mysql-server
 # export DEBIAN_FRONTEND="noninteractive"
@@ -41,7 +47,8 @@ sudo apt update
 sudo apt install mysql-server -y
 sudo systemctl start mysql.service
 # sudo mysql_secure_installation
-# Please use following command to setup root password.
+
+# Please use following command to set root password for the MYSQL.
 # sudo mysql
 # ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'Root@1234';
 # flush privileges;
@@ -72,57 +79,57 @@ sudo apt install phpmyadmin php-mbstring php-zip php-gd php-json php-curl -y
 sudo phpenmod mbstring
 sudo systemctl restart apache2
 
-# Install PhpMyAdmin v5.1.4
-echo -e "\n\nInstalling phpmyadmin\n"
-wget https://files.phpmyadmin.net/phpMyAdmin/5.1.4/phpMyAdmin-5.1.4-all-languages.zip
-unzip phpMyAdmin-5.1.4-all-languages.zip
-sudo mv phpMyAdmin-5.1.4-all-languages /usr/share/phpmyadmin
-# set the proper permissions
-sudo mkdir /usr/share/phpmyadmin/tmp
-sudo chown -R www-data:www-data /usr/share/phpmyadmin
-sudo chmod 777 /usr/share/phpmyadmin/tmp
-# sudo touch /etc/apache2/conf-available/phpmyadmin.conf
-echo "
-Alias /phpmyadmin /usr/share/phpmyadmin
-Alias /phpMyAdmin /usr/share/phpmyadmin
- 
-<Directory /usr/share/phpmyadmin/>
-   AddDefaultCharset UTF-8
-   <IfModule mod_authz_core.c>
-      <RequireAny>
-      Require all granted
-     </RequireAny>
-   </IfModule>
-</Directory>
- 
-<Directory /usr/share/phpmyadmin/setup/>
-   <IfModule mod_authz_core.c>
-     <RequireAny>
-       Require all granted
-     </RequireAny>
-   </IfModule>
-</Directory>" > phpmyadmin.conf
-sudo mv phpmyadmin.conf /etc/apache2/conf-available
-sudo a2enconf phpmyadmin
-sudo systemctl restart apache2
-
 ## Configure PhpMyAdmin
 # echo 'Include /etc/phpmyadmin/apache.conf' >> /etc/apache2/apache2.conf
 
-## Install MySql workbench.
-# echo -e "\n\nInstalling workbench\n"
-# sudo apt update
-# sudo snap install mysql-workbench-community
+# # Install PhpMyAdmin v5.1.4
+# echo -e "\n\nInstalling phpmyadmin\n"
+# wget https://files.phpmyadmin.net/phpMyAdmin/5.1.4/phpMyAdmin-5.1.4-all-languages.zip
+# unzip phpMyAdmin-5.1.4-all-languages.zip
+# sudo mv phpMyAdmin-5.1.4-all-languages /usr/share/phpmyadmin
+# # set the proper permissions
+# sudo mkdir /usr/share/phpmyadmin/tmp
+# sudo chown -R www-data:www-data /usr/share/phpmyadmin
+# sudo chmod 777 /usr/share/phpmyadmin/tmp
+# # sudo touch /etc/apache2/conf-available/phpmyadmin.conf
+# echo "
+# Alias /phpmyadmin /usr/share/phpmyadmin
+# Alias /phpMyAdmin /usr/share/phpmyadmin
+ 
+# <Directory /usr/share/phpmyadmin/>
+#    AddDefaultCharset UTF-8
+#    <IfModule mod_authz_core.c>
+#       <RequireAny>
+#       Require all granted
+#      </RequireAny>
+#    </IfModule>
+# </Directory>
+ 
+# <Directory /usr/share/phpmyadmin/setup/>
+#    <IfModule mod_authz_core.c>
+#      <RequireAny>
+#        Require all granted
+#      </RequireAny>
+#    </IfModule>
+# </Directory>" > phpmyadmin.conf
+# sudo mv phpmyadmin.conf /etc/apache2/conf-available
+# sudo a2enconf phpmyadmin
+# sudo systemctl restart apache2
 
 # Give a www-data ownership to www directory
-echo -e "\n\n Ownership for /var/www\n"
-sudo chown -R $(whoami):$(whoami) /var/www
-echo -e "\n\n Ownership have been set\n"
+# echo -e "\n\n Ownership for /var/www\n"
+# sudo chown -R $(whoami):$(whoami) /var/www
+# echo -e "\n\n Ownership have been set\n"
 
 # Give a write permission to www directory
 echo -e "\n\nPermissions for /var/www\n"
 sudo chmod 777 /var/www
 echo -e "\n\n Permissions have been set\n"
+
+## Install MySql workbench.
+# echo -e "\n\nInstalling workbench\n"
+# sudo apt update
+# sudo snap install mysql-workbench-community
 
 # Install Zip, Unzip, Git
 echo -e "\n\nInstalling Git, Zip, and Unzip\n"
@@ -147,7 +154,7 @@ sudo apt install build-essential
 echo 'export PATH=$HOME/local/bin:$PATH' >> ~/.bashrc
 source ~/.bashrc
 sudo apt install npm
-sudo chown -R $(whoami) /usr/local/lib/nodejs/bin/npm
+# sudo chown -R $(whoami) /usr/local/lib/nodejs/bin/npm
 
 # Install docker 
 echo -e "\n\nInstalling docker 14\n"
@@ -163,23 +170,9 @@ sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
 apt-cache madison docker-ce
 sudo apt-get install docker-ce=5:20.10.17~3-0~ubuntu-focal docker-ce-cli=5:20.10.17~3-0~ubuntu-focal containerd.io docker-compose-plugin
 sudo groupadd docker
-sudo usermod -aG docker $(whoami)
-sudo chown "$(whoami)":"$(whoami)" /home/"$(whoami)"/.docker -R
+# sudo usermod -aG docker $(whoami)
+# sudo chown "$(whoami)":"$(whoami)" /home/"$(whoami)"/.docker -R
 sudo chmod g+rwx "$HOME/.docker" -R
-
-# Install Dukto
-echo -e "\n\nInstalling Dukto\n"
-sudo add-apt-repository ppa:xuzhen666/dukto
-sudo apt update
-sudo apt install dukto
-
-# Install Brave
-echo -e "\n\nInstalling Brave\n"
-sudo apt install apt-transport-https curl
-curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
-echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg arch=amd64] https://brave-browser-apt-release.s3.brave.com/ stable main"|sudo tee /etc/apt/sources.list.d/brave-browser-release.list
-sudo apt update
-sudo apt install brave-browser
 
 # Install VS code
 echo -e "\n\nInstalling VS code\n"
@@ -229,5 +222,19 @@ phpcs -i
 #   [nN] ) echo "\e[1;41m No \e[0m"
 #     exit;;
 # esac
+
+# Install Dukto
+echo -e "\n\nInstalling Dukto\n"
+sudo add-apt-repository ppa:xuzhen666/dukto
+sudo apt update
+sudo apt install dukto
+
+# Install Brave
+echo -e "\n\nInstalling Brave\n"
+sudo apt install apt-transport-https curl
+curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg arch=amd64] https://brave-browser-apt-release.s3.brave.com/ stable main"|sudo tee /etc/apt/sources.list.d/brave-browser-release.list
+sudo apt update
+sudo apt install brave-browser
 
 # done

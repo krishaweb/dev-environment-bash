@@ -24,8 +24,7 @@
 - Docker
 - Node & NPM
 - Git
-- Zip
-- Unzip
+- Zip & Unzip
 - Composer
 - Brave
 - Dukto
