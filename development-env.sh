@@ -12,11 +12,11 @@ fi
 
 # Update packages and upgrade pending packages.
 echo -e "\n\nUpdating apt packages and upgrading latest patches\n"
-sudo apt-get update -y && sudo apt-get upgrade -y
+sudo apt update -y && sudo apt upgrade -y
 
 # Install apache2 packages.
 echo -e "\n\nInstalling Apache2 Packages\n"
-sudo apt-get install apache2 -y
+sudo apt install apache2 -y
 sudo ufw allow in "Apache" -y
 sudo a2enmod rewrite
 sudo sed -i 's+DocumentRoot /var/www/html+DocumentRoot /var/www+g' /etc/apache2/sites-available/000-default.conf
@@ -37,7 +37,7 @@ sudo sed -z 's|<Directory /var/www/>\n\tOptions Indexes FollowSymLinks\n\tAllowO
 # wget https://dev.mysql.com/get/mysql-apt-config_0.8.12-1_all.deb
 # sudo dpkg -i mysql-apt-config_0.8.12-1_all.deb
 # sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 467B942D3A79BD29
-# sudo apt-get update
+# sudo apt update
 # sudo apt-cache policy mysql-server
 # sudo apt install -f mysql-client=5.7* mysql-community-server=5.7* mysql-server=5.7*
 # sudo mysql_secure_installation
@@ -57,7 +57,7 @@ sudo systemctl start mysql.service
 # Install PHP packages.
 echo -e "\n\nInstalling PHP & Requirements\n"
 sudo apt update
-sudo apt-get install php libapache2-mod-php php-mysql -y
+sudo apt install php libapache2-mod-php php-mysql -y
 
 # Install Multiple PHP versions.
 echo -e "\n\nInstalling PHP version 8.0 & 8.1\n"
@@ -158,17 +158,17 @@ sudo apt install npm
 
 # Install docker 
 echo -e "\n\nInstalling docker 14\n"
-sudo apt-get update
-sudo apt-get install ca-certificates curl gnupg lsb-release
+sudo apt update
+sudo apt install ca-certificates curl gnupg lsb-release
 sudo mkdir -p /etc/apt/keyrings
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 echo \
   "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
   $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-sudo apt-get update
-sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
+sudo apt update
+sudo apt install docker-ce docker-ce-cli containerd.io docker-compose-plugin
 apt-cache madison docker-ce
-sudo apt-get install docker-ce=5:20.10.17~3-0~ubuntu-focal docker-ce-cli=5:20.10.17~3-0~ubuntu-focal containerd.io docker-compose-plugin
+sudo apt install docker-ce=5:20.10.17~3-0~ubuntu-focal docker-ce-cli=5:20.10.17~3-0~ubuntu-focal containerd.io docker-compose-plugin
 sudo groupadd docker
 # sudo usermod -aG docker $(whoami)
 # sudo chown "$(whoami)":"$(whoami)" /home/"$(whoami)"/.docker -R
