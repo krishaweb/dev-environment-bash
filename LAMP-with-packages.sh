@@ -62,55 +62,55 @@ sudo apt install software-properties-common
 sudo add-apt-repository ppa:ondrej/php
 sudo apt update
 sudo apt install php8.1 php8.1-common libapache2-mod-php8.1 php8.1-intl php8.1-zip php8.1-curl php8.1-gd php8.1-gmp php8.1-pgsql php8.1-xml php8.1-dev php8.1-imap php8.1-mbstring php8.1-soap php8.1-mysql libapache2-mod-fcgid
-echo -e "\n\n Switching PHP version from 7.4 to 8.1"
-sudo a2dismod php7.4
+echo -e "\n\n Switching PHP version from 8.2 to 8.1"
+sudo a2dismod php8.2
 sudo a2enmod php8.1
 sudo systemctl restart apache2
 sudo update-alternatives --config php
 
 # Install Latest PhpMyAdmin
-echo -e "\n\nInstalling phpmyadmin\n"
-sudo apt update
-sudo apt install phpmyadmin php-mbstring php-zip php-gd php-json php-curl -y
-sudo phpenmod mbstring
-sudo systemctl restart apache2
+# echo -e "\n\nInstalling phpmyadmin\n"
+# sudo apt update
+# sudo apt install phpmyadmin -y
+# sudo phpenmod mbstring
+# sudo systemctl restart apache2
 
 ## Configure PhpMyAdmin
 # echo 'Include /etc/phpmyadmin/apache.conf' >> /etc/apache2/apache2.conf
 
-# # Install PhpMyAdmin v5.1.4
-# echo -e "\n\nInstalling phpmyadmin\n"
-# wget https://files.phpmyadmin.net/phpMyAdmin/5.1.4/phpMyAdmin-5.1.4-all-languages.zip
-# unzip phpMyAdmin-5.1.4-all-languages.zip
-# sudo mv phpMyAdmin-5.1.4-all-languages /usr/share/phpmyadmin
-# # set the proper permissions
-# sudo mkdir /usr/share/phpmyadmin/tmp
-# sudo chown -R www-data:www-data /usr/share/phpmyadmin
-# sudo chmod 777 /usr/share/phpmyadmin/tmp
-# # sudo touch /etc/apache2/conf-available/phpmyadmin.conf
-# echo "
-# Alias /phpmyadmin /usr/share/phpmyadmin
-# Alias /phpMyAdmin /usr/share/phpmyadmin
+# Install PhpMyAdmin v5.1.4
+echo -e "\n\nInstalling phpmyadmin\n"
+wget https://files.phpmyadmin.net/phpMyAdmin/5.1.4/phpMyAdmin-5.1.4-all-languages.zip
+unzip phpMyAdmin-5.1.4-all-languages.zip
+sudo mv phpMyAdmin-5.1.4-all-languages /usr/share/phpmyadmin
+# set the proper permissions
+sudo mkdir /usr/share/phpmyadmin/tmp
+sudo chown -R www-data:www-data /usr/share/phpmyadmin
+sudo chmod 777 /usr/share/phpmyadmin/tmp
+# sudo touch /etc/apache2/conf-available/phpmyadmin.conf
+echo "
+Alias /phpmyadmin /usr/share/phpmyadmin
+Alias /phpMyAdmin /usr/share/phpmyadmin
  
-# <Directory /usr/share/phpmyadmin/>
-#    AddDefaultCharset UTF-8
-#    <IfModule mod_authz_core.c>
-#       <RequireAny>
-#       Require all granted
-#      </RequireAny>
-#    </IfModule>
-# </Directory>
+<Directory /usr/share/phpmyadmin/>
+   AddDefaultCharset UTF-8
+   <IfModule mod_authz_core.c>
+      <RequireAny>
+      Require all granted
+     </RequireAny>
+   </IfModule>
+</Directory>
  
-# <Directory /usr/share/phpmyadmin/setup/>
-#    <IfModule mod_authz_core.c>
-#      <RequireAny>
-#        Require all granted
-#      </RequireAny>
-#    </IfModule>
-# </Directory>" > phpmyadmin.conf
-# sudo mv phpmyadmin.conf /etc/apache2/conf-available
-# sudo a2enconf phpmyadmin
-# sudo systemctl restart apache2
+<Directory /usr/share/phpmyadmin/setup/>
+   <IfModule mod_authz_core.c>
+     <RequireAny>
+       Require all granted
+     </RequireAny>
+   </IfModule>
+</Directory>" > phpmyadmin.conf
+sudo mv phpmyadmin.conf /etc/apache2/conf-available
+sudo a2enconf phpmyadmin
+sudo systemctl restart apache2
 
 # Give a www-data ownership to www directory
 # echo -e "\n\n Ownership for /var/www\n"
