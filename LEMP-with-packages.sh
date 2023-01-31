@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ###################################################
-# Bash script to install an LAMP stack in ubuntu OS
+# Bash script to install an LEMP stack in ubuntu OS
 # Author: girishpanchal
 
 # Check whether you are running this as a root.
@@ -12,35 +12,15 @@ fi
 
 # Update packages and upgrade pending packages.
 echo -e "\n\nUpdating apt packages and upgrading latest patches\n"
-sudo apt-get update -y && sudo apt-get upgrade -y
-
-# Install apache2 packages.
-echo -e "\n\nInstalling Apache2 Packages\n"
-sudo apt-get install apache2 -y
-sudo ufw allow in "Apache" -y
-sudo a2enmod rewrite
-sudo sed -i 's+DocumentRoot /var/www/html+DocumentRoot /var/www+g' /etc/apache2/sites-available/000-default.conf
-sudo sed -z 's|<Directory /var/www/>\n\tOptions Indexes FollowSymLinks\n\tAllowOverride None|<Directory /var/www/>\n\tOptions Indexes FollowSymLinks\n\tAllowOverride All|' -i /etc/apache2/apache2.conf
+sudo apt update -y && sudo apt upgrade -y
 
 # Install NGINX packages.
-# echo -e "\n\nInstalling NGINX Packages\n"
-# sudo apt update
-# sudo apt install nginx
-# sudo ufw allow 'Nginx HTTP'
-
-# Install MySQL-5.7 database & mysql-server
-# export DEBIAN_FRONTEND="noninteractive"
-# debconf-set-selections <<< "mysql-server mysql-server/root_password password $db_root_password"
-# debconf-set-selections <<< "mysql-server mysql-server/root_password_again password $db_root_password"
-# sudo apt update
-# sudo apt install wget -y
-# wget https://dev.mysql.com/get/mysql-apt-config_0.8.12-1_all.deb
-# sudo dpkg -i mysql-apt-config_0.8.12-1_all.deb
-# sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 467B942D3A79BD29
-# sudo apt-get update
-# sudo apt-cache policy mysql-server
-# sudo apt install -f mysql-client=5.7* mysql-community-server=5.7* mysql-server=5.7*
-# sudo mysql_secure_installation
+echo -e "\n\nInstalling NGINX Packages\n"
+sudo apt update
+sudo apt install nginx
+sudo ufw allow 'Nginx HTTP'
+# Allow 22 port to connect SSH
+sudo ufw allow 22
 
 # Install MySQL-8.0.27 database & mysql-server
 sudo apt update
@@ -57,64 +37,56 @@ sudo systemctl start mysql.service
 # Install PHP packages.
 echo -e "\n\nInstalling PHP & Requirements\n"
 sudo apt update
-sudo apt-get install php libapache2-mod-php php-mysql -y
-
-# Install Multiple PHP versions.
-echo -e "\n\nInstalling PHP version 8.0 & 8.1\n"
-sudo apt update
-sudo apt install software-properties-common
 sudo add-apt-repository ppa:ondrej/php
 sudo apt update
-sudo apt install php8.1 php8.1-common libapache2-mod-php8.1 php8.1-intl php8.1-zip php8.1-curl php8.1-gd php8.1-gmp php8.1-pgsql php8.1-xml php8.1-dev php8.1-imap php8.1-mbstring php8.1-soap php8.1-mysql libapache2-mod-fcgid
-echo -e "\n\n Switching PHP version from 7.4 to 8.1"
-sudo a2dismod php7.4
-sudo a2enmod php8.1
-sudo systemctl restart apache2
-sudo update-alternatives --config php
+sudo apt install php8.1 php8.1-fpm php8.1-mysql php-common php8.1-cli php8.1-common php8.1-opcache php8.1-readline php8.1-mbstring php8.1-xml php8.1-gd php8.1-curl -y
+sudo systemctl start php8.1-fpm
 
 # Install Latest PhpMyAdmin
 echo -e "\n\nInstalling phpmyadmin\n"
 sudo apt update
-sudo apt install phpmyadmin php-mbstring php-zip php-gd php-json php-curl -y
+sudo apt install phpmyadmin -y
 sudo phpenmod mbstring
-sudo systemctl restart apache2
+sudo systemctl restart nginx
 
-## Configure PhpMyAdmin
-# echo 'Include /etc/phpmyadmin/apache.conf' >> /etc/apache2/apache2.conf
+# Create server block for the nginx
+sudo touch /etc/nginx/sites-available/my_site
+echo "
+server {
+    listen 80;
+    server_name your_domain www.your_domain;
+    root /var/www/your_domain;
 
-# # Install PhpMyAdmin v5.1.4
-# echo -e "\n\nInstalling phpmyadmin\n"
-# wget https://files.phpmyadmin.net/phpMyAdmin/5.1.4/phpMyAdmin-5.1.4-all-languages.zip
-# unzip phpMyAdmin-5.1.4-all-languages.zip
-# sudo mv phpMyAdmin-5.1.4-all-languages /usr/share/phpmyadmin
-# # set the proper permissions
-# sudo mkdir /usr/share/phpmyadmin/tmp
-# sudo chown -R www-data:www-data /usr/share/phpmyadmin
-# sudo chmod 777 /usr/share/phpmyadmin/tmp
-# # sudo touch /etc/apache2/conf-available/phpmyadmin.conf
-# echo "
-# Alias /phpmyadmin /usr/share/phpmyadmin
-# Alias /phpMyAdmin /usr/share/phpmyadmin
- 
-# <Directory /usr/share/phpmyadmin/>
-#    AddDefaultCharset UTF-8
-#    <IfModule mod_authz_core.c>
-#       <RequireAny>
-#       Require all granted
-#      </RequireAny>
-#    </IfModule>
-# </Directory>
- 
-# <Directory /usr/share/phpmyadmin/setup/>
-#    <IfModule mod_authz_core.c>
-#      <RequireAny>
-#        Require all granted
-#      </RequireAny>
-#    </IfModule>
-# </Directory>" > phpmyadmin.conf
-# sudo mv phpmyadmin.conf /etc/apache2/conf-available
-# sudo a2enconf phpmyadmin
-# sudo systemctl restart apache2
+    index index.html index.htm index.php;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/var/run/php/php8.1-fpm.sock;
+     }
+
+    location ~ /\.ht {
+        deny all;
+    }
+
+}" > my_site
+sudo ln -s /etc/nginx/sites-available/my_site /etc/nginx/sites-enabled/
+# Unlink default config
+#sudo unlink /etc/nginx/sites-enabled/default
+sudo systemctl reload nginx
+
+# Install postgres database.
+sudo apt update
+sudo apt upgrade -y
+sudo apt install postgresql postgresql-client -y
+sudo systemctl enable postgresql.service
+# sudo su -l postgres
+# psql -c "alter user postgres with password 'Root@1234'";
+# exit;
+sudo service postgresql restart
 
 # Give a www-data ownership to www directory
 # echo -e "\n\n Ownership for /var/www\n"
@@ -158,17 +130,17 @@ sudo apt install npm
 
 # Install docker 
 echo -e "\n\nInstalling docker 14\n"
-sudo apt-get update
-sudo apt-get install ca-certificates curl gnupg lsb-release
+sudo apt update
+sudo apt install ca-certificates curl gnupg lsb-release
 sudo mkdir -p /etc/apt/keyrings
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 echo \
   "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
   $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-sudo apt-get update
-sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
+sudo apt update
+sudo apt install docker-ce docker-ce-cli containerd.io docker-compose-plugin
 apt-cache madison docker-ce
-sudo apt-get install docker-ce=5:20.10.17~3-0~ubuntu-focal docker-ce-cli=5:20.10.17~3-0~ubuntu-focal containerd.io docker-compose-plugin
+sudo apt install docker-ce=5:20.10.17~3-0~ubuntu-focal docker-ce-cli=5:20.10.17~3-0~ubuntu-focal containerd.io docker-compose-plugin
 sudo groupadd docker
 # sudo usermod -aG docker $(whoami)
 # sudo chown "$(whoami)":"$(whoami)" /home/"$(whoami)"/.docker -R
