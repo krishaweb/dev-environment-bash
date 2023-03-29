@@ -7,19 +7,18 @@
   'chmod +x script-name-here.sh'
 - To run shell script file:
 
-  ```./script-name-here.sh```
+  ```sudo ./LAMP-with-packages.sh```
 
   Another option:
 
-  ```sh script-name-here.sh```
+  ```sudo sh LAMP-with-packages.sh```
 
   OR
 
-  ```bash script-name-here.sh```
+  ```sudo LAMP-with-packages.sh```
 
 ## Packages include
 - LAMP
-- phpMyAdmin
 - MySQL Workbench
 - Docker
 - Node & NPM

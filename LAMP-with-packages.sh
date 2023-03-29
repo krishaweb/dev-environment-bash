@@ -17,26 +17,12 @@ sudo apt update -y && sudo apt upgrade -y
 # Install apache2 packages.
 echo -e "\n\nInstalling Apache2 Packages\n"
 sudo apt install apache2 -y
-sudo ufw allow in "Apache" -y
+sudo ufw allow in "Apache Full"
 # Allow 22 port to connect SSH
 sudo ufw allow 22
 sudo a2enmod rewrite
 sudo sed -i 's+DocumentRoot /var/www/html+DocumentRoot /var/www+g' /etc/apache2/sites-available/000-default.conf
 sudo sed -z 's|<Directory /var/www/>\n\tOptions Indexes FollowSymLinks\n\tAllowOverride None|<Directory /var/www/>\n\tOptions Indexes FollowSymLinks\n\tAllowOverride All|' -i /etc/apache2/apache2.conf
-
-# Install MySQL-5.7 database & mysql-server
-# export DEBIAN_FRONTEND="noninteractive"
-# debconf-set-selections <<< "mysql-server mysql-server/root_password password $db_root_password"
-# debconf-set-selections <<< "mysql-server mysql-server/root_password_again password $db_root_password"
-# sudo apt update
-# sudo apt install wget -y
-# wget https://dev.mysql.com/get/mysql-apt-config_0.8.12-1_all.deb
-# sudo dpkg -i mysql-apt-config_0.8.12-1_all.deb
-# sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 467B942D3A79BD29
-# sudo apt update
-# sudo apt-cache policy mysql-server
-# sudo apt install -f mysql-client=5.7* mysql-community-server=5.7* mysql-server=5.7*
-# sudo mysql_secure_installation
 
 # Install MySQL-8.0.27 database & mysql-server
 sudo apt update
@@ -56,61 +42,61 @@ sudo apt update
 sudo apt install php libapache2-mod-php php-mysql -y
 
 # Install Multiple PHP versions.
-echo -e "\n\nInstalling PHP version 8.0 & 8.1\n"
-sudo apt update
-sudo apt install software-properties-common
-sudo add-apt-repository ppa:ondrej/php
-sudo apt update
-sudo apt install php8.1 php8.1-common libapache2-mod-php8.1 php8.1-intl php8.1-zip php8.1-curl php8.1-gd php8.1-gmp php8.1-pgsql php8.1-xml php8.1-dev php8.1-imap php8.1-mbstring php8.1-soap php8.1-mysql libapache2-mod-fcgid
-echo -e "\n\n Switching PHP version from 8.2 to 8.1"
-sudo a2dismod php8.2
-sudo a2enmod php8.1
-sudo systemctl restart apache2
-sudo update-alternatives --config php
-
-# Install Latest PhpMyAdmin
-# echo -e "\n\nInstalling phpmyadmin\n"
+# echo -e "\n\nInstalling PHP version 8.0 & 8.1\n"
 # sudo apt update
-# sudo apt install phpmyadmin -y
-# sudo phpenmod mbstring
+# sudo apt install software-properties-common
+# sudo add-apt-repository ppa:ondrej/php
+# sudo apt update
+# sudo apt install php8.1 php8.1-common libapache2-mod-php8.1 php8.1-intl php8.1-zip php8.1-curl php8.1-gd php8.1-gmp php8.1-pgsql php8.1-xml php8.1-dev php8.1-imap php8.1-mbstring php8.1-soap php8.1-mysql libapache2-mod-fcgid
+# echo -e "\n\n Switching PHP version from 8.2 to 8.1"
+# sudo a2dismod php8.2
+# sudo a2enmod php8.1
 # sudo systemctl restart apache2
+# sudo update-alternatives --config php
+
+Install Latest PhpMyAdmin
+echo -e "\n\nInstalling phpmyadmin\n"
+sudo apt update
+sudo apt install phpmyadmin -y
+sudo phpenmod mbstring
+sudo systemctl restart apache2
 
 ## Configure PhpMyAdmin
-# echo 'Include /etc/phpmyadmin/apache.conf' >> /etc/apache2/apache2.conf
+echo 'Include /etc/phpmyadmin/apache.conf' >> /etc/apache2/apache2.conf
 
 # Install PhpMyAdmin v5.1.4
-echo -e "\n\nInstalling phpmyadmin\n"
-wget https://files.phpmyadmin.net/phpMyAdmin/5.1.4/phpMyAdmin-5.1.4-all-languages.zip
-unzip phpMyAdmin-5.1.4-all-languages.zip
-sudo mv phpMyAdmin-5.1.4-all-languages /usr/share/phpmyadmin
-# set the proper permissions
-sudo mkdir /usr/share/phpmyadmin/tmp
-sudo chown -R www-data:www-data /usr/share/phpmyadmin
-sudo chmod 777 /usr/share/phpmyadmin/tmp
-# sudo touch /etc/apache2/conf-available/phpmyadmin.conf
-echo "
-Alias /phpmyadmin /usr/share/phpmyadmin
-Alias /phpMyAdmin /usr/share/phpmyadmin
+# echo -e "\n\nInstalling phpmyadmin\n"
+# wget https://files.phpmyadmin.net/phpMyAdmin/5.1.4/phpMyAdmin-5.1.4-all-languages.zip
+# unzip phpMyAdmin-5.1.4-all-languages.zip
+# sudo mv phpMyAdmin-5.1.4-all-languages /usr/share/phpmyadmin
+# # set the proper permissions
+# sudo mkdir /usr/share/phpmyadmin/tmp
+# sudo chown -R www-data:www-data /usr/share/phpmyadmin
+# sudo chmod 777 /usr/share/phpmyadmin/tmp
+# # sudo touch /etc/apache2/conf-available/phpmyadmin.conf
+# echo "
+# Alias /phpmyadmin /usr/share/phpmyadmin
+# Alias /phpMyAdmin /usr/share/phpmyadmin
  
-<Directory /usr/share/phpmyadmin/>
-   AddDefaultCharset UTF-8
-   <IfModule mod_authz_core.c>
-      <RequireAny>
-      Require all granted
-     </RequireAny>
-   </IfModule>
-</Directory>
+# <Directory /usr/share/phpmyadmin/>
+#    AddDefaultCharset UTF-8
+#    <IfModule mod_authz_core.c>
+#       <RequireAny>
+#       Require all granted
+#      </RequireAny>
+#    </IfModule>
+# </Directory>
  
-<Directory /usr/share/phpmyadmin/setup/>
-   <IfModule mod_authz_core.c>
-     <RequireAny>
-       Require all granted
-     </RequireAny>
-   </IfModule>
-</Directory>" > phpmyadmin.conf
-sudo mv phpmyadmin.conf /etc/apache2/conf-available
-sudo a2enconf phpmyadmin
-sudo systemctl restart apache2
+# <Directory /usr/share/phpmyadmin/setup/>
+#    <IfModule mod_authz_core.c>
+#      <RequireAny>
+#        Require all granted
+#      </RequireAny>
+#    </IfModule>
+# </Directory>" > phpmyadmin.conf
+# sudo mv phpmyadmin.conf /etc/apache2/conf-available
+# sudo a2enconf phpmyadmin
+# sudo systemctl restart apache2
 
 # Give a www-data ownership to www directory
 # echo -e "\n\n Ownership for /var/www\n"
@@ -122,15 +108,15 @@ echo -e "\n\nPermissions for /var/www\n"
 sudo chmod 777 /var/www
 echo -e "\n\n Permissions have been set\n"
 
-## Install MySql workbench.
-# echo -e "\n\nInstalling workbench\n"
-# sudo apt update
-# sudo snap install mysql-workbench-community
-
 # Install Zip, Unzip, Git
 echo -e "\n\nInstalling Git, Zip, and Unzip\n"
 sudo apt update
 sudo apt install zip unzip git
+
+## Install MySql workbench.
+echo -e "\n\nInstalling workbench\n"
+sudo apt update
+sudo snap install mysql-workbench-community
 
 # Install composer
 echo -e "\n\nInstalling Composer\n"
@@ -177,7 +163,7 @@ wget -q https://packages.microsoft.com/keys/microsoft.asc -O- | sudo apt-key add
 sudo add-apt-repository "deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main"
 sudo apt install code
 
-# Install Sublime Text editor 3
+# Install Sublime Text editor
 echo -e "\n\nInstalling Sublime Text Editor\n"
 sudo apt update
 curl -fsSL https://download.sublimetext.com/sublimehq-pub.gpg | sudo apt-key add -
