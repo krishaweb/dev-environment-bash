@@ -18,7 +18,7 @@ sudo apt update -y && sudo apt upgrade -y
 echo -e "\n\nInstalling NGINX Packages\n"
 sudo apt update
 sudo apt install nginx
-sudo ufw allow 'Nginx HTTP'
+sudo ufw allow 'Nginx Full'
 # Allow 22 port to connect SSH
 sudo ufw allow 22
 
