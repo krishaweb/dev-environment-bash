@@ -29,10 +29,10 @@ sudo systemctl start mysql.service
 # sudo mysql_secure_installation
 
 # Please use following command to set root password for the MYSQL.
-# sudo mysql
-# ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'Root@1234';
-# flush privileges;
-# exit;
+sudo mysql
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'Root@1234';
+flush privileges;
+exit;
 
 # Install PHP packages.
 echo -e "\n\nInstalling PHP & Requirements\n"
@@ -75,18 +75,18 @@ server {
 }" > my_site
 sudo ln -s /etc/nginx/sites-available/my_site /etc/nginx/sites-enabled/
 # Unlink default config
-#sudo unlink /etc/nginx/sites-enabled/default
+# sudo unlink /etc/nginx/sites-enabled/default
 sudo systemctl reload nginx
 
 # Install postgres database.
-sudo apt update
-sudo apt upgrade -y
-sudo apt install postgresql postgresql-client -y
-sudo systemctl enable postgresql.service
+# sudo apt update
+# sudo apt upgrade -y
+# sudo apt install postgresql postgresql-client -y
+# sudo systemctl enable postgresql.service
 # sudo su -l postgres
 # psql -c "alter user postgres with password 'Root@1234'";
 # exit;
-sudo service postgresql restart
+# sudo service postgresql restart
 
 # Give a www-data ownership to www directory
 # echo -e "\n\n Ownership for /var/www\n"
@@ -173,27 +173,6 @@ composer global require "squizlabs/php_codesniffer=*"
 echo 'export PATH=$HOME/.config/composer/vendor/bin:$PATH' >> ~/.bashrc
 source ~/.bashrc
 phpcs -i
-
-# install_wpcli() {
-#   curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
-#   php wp-cli.phar --info
-#   chmod +x wp-cli.phar
-#   sudo mv wp-cli.phar /usr/local/bin/wp
-#   wp --info
-#   echo "\e[1;42m WP CLI install successfully \e[0m"
-# }
-
-# while true; do
-
-# read -p "Do you want to install WP CLI for WordPress (y/n) " yn
-
-# case $yn in
-#   [yY] )
-#     install_wpcli
-#     break;;
-#   [nN] ) echo "\e[1;41m No \e[0m"
-#     exit;;
-# esac
 
 # Install Dukto
 echo -e "\n\nInstalling Dukto\n"

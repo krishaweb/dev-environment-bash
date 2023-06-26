@@ -31,10 +31,10 @@ sudo systemctl start mysql.service
 # sudo mysql_secure_installation
 
 # Please use following command to set root password for the MYSQL.
-# sudo mysql
-# ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'Root@1234';
-# flush privileges;
-# exit;
+sudo mysql
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'Root@1234';
+flush privileges;
+exit;
 
 # Install PHP packages.
 echo -e "\n\nInstalling PHP & Requirements\n"
