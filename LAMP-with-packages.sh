@@ -32,6 +32,7 @@ sudo systemctl start mysql.service
 
 # Please use following command to set root password for the MYSQL.
 # sudo mysql
+sudo mysql -u root -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'Root@1234';FLUSH PRIVILEGES;exit;"
 # ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'Root@1234';
 # flush privileges;
 # exit;
