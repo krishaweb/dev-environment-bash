@@ -29,8 +29,8 @@ sudo systemctl start mysql.service
 # sudo mysql_secure_installation
 
 # Please use following command to set root password for the MYSQL.
-sudo mysql -u root -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'Root@1234';FLUSH PRIVILEGES;exit;"
-# ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'Root@1234';
+sudo mysql -u root -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH caching_sha2_password BY 'Root@1234'; FLUSH PRIVILEGES; exit;"
+# ALTER USER 'root'@'localhost' IDENTIFIED WITH caching_sha2_password BY 'Root@1234';
 # flush privileges;
 # exit;
 
@@ -112,35 +112,34 @@ sudo apt install zip unzip git
 echo -e "\n\nInstalling Composer\n"
 sudo apt update
 php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-php -r "if (hash_file('sha384', 'composer-setup.php') === '55ce33d7678c5a611085589f1f3ddf8b3c52d662cd01d4ba75c0ee0459970c2200a51f492d557530c71c15d8dba01eae') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
+php -r "if (hash_file('sha384', 'composer-setup.php') === 'e21205b207c3ff031906575712edab6f13eb0b361f2085f1f1237b7126d785e826a450292b6cfd1d64d92e6563bbde02') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
 php composer-setup.php
 sudo mv composer.phar /usr/local/bin/composer
+php -r "unlink('composer-setup.php');"
 
-# Install nodejs-16 as a user
-echo -e "\n\nInstalling nodejs 14\n"
+# Install nodejs-18 as a user
+echo -e "\n\nInstalling nodejs 18\n"
 sudo apt update
-curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash -
-sudo apt install nodejs
+curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt install nodejs -y
 node -v
-sudo apt install build-essential
 echo 'export PATH=$HOME/local/bin:$PATH' >> ~/.bashrc
 source ~/.bashrc
-sudo apt install npm
 # sudo chown -R $(whoami) /usr/local/lib/nodejs/bin/npm
 
 # Install docker 
-echo -e "\n\nInstalling docker 14\n"
+echo -e "\n\nInstalling docker\n"
 sudo apt update
 sudo apt install ca-certificates curl gnupg lsb-release
-sudo mkdir -p /etc/apt/keyrings
+sudo install -m 0755 -d /etc/apt/keyrings
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
 echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+  "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 sudo apt update
-sudo apt install docker-ce docker-ce-cli containerd.io docker-compose-plugin
-apt-cache madison docker-ce
-sudo apt install docker-ce=5:20.10.17~3-0~ubuntu-focal docker-ce-cli=5:20.10.17~3-0~ubuntu-focal containerd.io docker-compose-plugin
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 sudo groupadd docker
 # sudo usermod -aG docker $(whoami)
 # sudo chown "$(whoami)":"$(whoami)" /home/"$(whoami)"/.docker -R
