@@ -17,12 +17,12 @@ sudo apt update -y && sudo apt upgrade -y
 # Install NGINX packages.
 echo -e "\n\nInstalling NGINX Packages\n"
 sudo apt update
-sudo apt install nginx
+sudo apt install nginx -y
 sudo ufw allow 'Nginx Full'
 # Allow 22 port to connect SSH
-sudo ufw allow 22
+sudo ufw allow 'OpenSSH'
 
-# Install MySQL-8.0.27 database & mysql-server
+# Install MySQL-8.0.34 database & mysql-server
 sudo apt update
 sudo apt install mysql-server -y
 sudo systemctl start mysql.service
@@ -37,16 +37,14 @@ sudo mysql -u root -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH caching_sha
 # Install PHP packages.
 echo -e "\n\nInstalling PHP & Requirements\n"
 sudo apt update
-sudo add-apt-repository ppa:ondrej/php
-sudo apt update
-sudo apt install php8.1 php8.1-fpm php8.1-mysql php-common php8.1-cli php8.1-common php8.1-opcache php8.1-readline php8.1-mbstring php8.1-xml php8.1-gd php8.1-curl -y
+sudo apt install php8.1-fpm php-mysql php-common php8.1-cli php8.1-common php8.1-opcache php8.1-readline php8.1-mbstring php8.1-xml php8.1-gd php8.1-curl -y
 sudo systemctl start php8.1-fpm
 
-# Install Latest PhpMyAdmin
+# Install latest PhpMyAdmin
 echo -e "\n\nInstalling phpmyadmin\n"
 sudo apt update
 sudo apt install phpmyadmin -y
-sudo phpenmod mbstring
+sudo ln -s /usr/share/phpmyadmin /var/www/phpmyadmin
 sudo systemctl restart nginx
 
 # Create server block for the nginx
@@ -73,6 +71,7 @@ server {
     }
 
 }" > my_site
+sudo mv my_site /etc/nginx/sites-available
 sudo ln -s /etc/nginx/sites-available/my_site /etc/nginx/sites-enabled/
 # Unlink default config
 # sudo unlink /etc/nginx/sites-enabled/default
@@ -93,11 +92,6 @@ sudo systemctl reload nginx
 # sudo chown -R $(whoami):$(whoami) /var/www
 # echo -e "\n\n Ownership have been set\n"
 
-# Give a write permission to www directory
-echo -e "\n\nPermissions for /var/www\n"
-sudo chmod 777 /var/www
-echo -e "\n\n Permissions have been set\n"
-
 ## Install MySql workbench.
 # echo -e "\n\nInstalling workbench\n"
 # sudo apt update
@@ -117,15 +111,28 @@ php composer-setup.php
 sudo mv composer.phar /usr/local/bin/composer
 php -r "unlink('composer-setup.php');"
 
-# Install nodejs-18 as a user
+# Install nodejs-20 as a user
 echo -e "\n\nInstalling nodejs 18\n"
 sudo apt update
-curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt install -y ca-certificates curl gnupg
+sudo mkdir -p /etc/apt/keyrings
+curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
+NODE_MAJOR=20
+echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list
+sudo apt update
 sudo apt install nodejs -y
 node -v
 echo 'export PATH=$HOME/local/bin:$PATH' >> ~/.bashrc
 source ~/.bashrc
 # sudo chown -R $(whoami) /usr/local/lib/nodejs/bin/npm
+
+# Install NVM to switch node version
+echo -e "\n\nInstalling nvm \n"
+sudo apt install curl
+curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash 
+source ~/.bashrc
+nvm install 18.16.0
+nvm use 18.16.0
 
 # Install docker 
 echo -e "\n\nInstalling docker\n"
