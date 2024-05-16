@@ -83,7 +83,6 @@ php composer-setup.php
 sudo mv composer.phar /usr/local/bin/composer
 php -r "unlink('composer-setup.php');"
 
-
 # Install nodejs through nvm
 echo -e "\n\Installing nodejs through nvm\n"
 sudo apt update
@@ -97,17 +96,12 @@ export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || pr
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
 
 source ~/.bashrc
-
 nvm --version  # Check nvm version
 nvm install node  # Will install latest node and npm 
 node -v  # Check node version
 
-
 # Install docker 
-
-# Run the following command to uninstall all conflicting packages:
-for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do sudo apt-get remove $pkg; done
-
+echo -e "\n\nInstalling docker\n"
 # Installing using the apt repository
 # Add Docker's official GPG key:
 sudo apt-get update
@@ -129,7 +123,6 @@ sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin 
 sudo groupadd docker
 sudo chmod g+rwx "$HOME/.docker" -R
 
-
 # Install VS code
 echo -e "\n\nInstalling VS code\n"
 sudo apt update
@@ -145,12 +138,10 @@ sudo add-apt-repository "deb https://download.sublimetext.com/ apt/stable/"
 sudo apt update
 sudo apt install sublime-text
 
-
 # Install FileZilla
 echo -e "\n\nInstalling Sublime Text Editor\n"
 sudo apt update
 sudo apt install filezilla
-
 
 # Install PHP_CodeSniffer
 echo -e "\n\nInstalling PHP_CodeSniffer\n"
@@ -159,7 +150,6 @@ composer global require "squizlabs/php_codesniffer=*"
 echo 'export PATH=$HOME/.config/composer/vendor/bin:$PATH' >> ~/.bashrc
 source ~/.bashrc
 phpcs -i
-
 
 # install_wpcli() {
 #   curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
@@ -181,7 +171,6 @@ phpcs -i
 #   [nN] ) echo "\e[1;41m No \e[0m"
 #     exit;;
 # esac
-
 
 # Install Dukto
 echo -e "\n\nInstalling Dukto\n"
