@@ -64,45 +64,6 @@ sudo systemctl restart apache2
 ## Configure PhpMyAdmin
 echo 'Include /etc/phpmyadmin/apache.conf' >> /etc/apache2/apache2.conf
 
-# Install PhpMyAdmin v5.1.4
-# echo -e "\n\nInstalling phpmyadmin\n"
-# wget https://files.phpmyadmin.net/phpMyAdmin/5.1.4/phpMyAdmin-5.1.4-all-languages.zip
-# unzip phpMyAdmin-5.1.4-all-languages.zip
-# sudo mv phpMyAdmin-5.1.4-all-languages /usr/share/phpmyadmin
-# # set the proper permissions
-# sudo mkdir /usr/share/phpmyadmin/tmp
-# sudo chown -R www-data:www-data /usr/share/phpmyadmin
-# sudo chmod 777 /usr/share/phpmyadmin/tmp
-# # sudo touch /etc/apache2/conf-available/phpmyadmin.conf
-# echo "
-# Alias /phpmyadmin /usr/share/phpmyadmin
-# Alias /phpMyAdmin /usr/share/phpmyadmin
- 
-# <Directory /usr/share/phpmyadmin/>
-#    AddDefaultCharset UTF-8
-#    <IfModule mod_authz_core.c>
-#       <RequireAny>
-#       Require all granted
-#      </RequireAny>
-#    </IfModule>
-# </Directory>
- 
-# <Directory /usr/share/phpmyadmin/setup/>
-#    <IfModule mod_authz_core.c>
-#      <RequireAny>
-#        Require all granted
-#      </RequireAny>
-#    </IfModule>
-# </Directory>" > phpmyadmin.conf
-# sudo mv phpmyadmin.conf /etc/apache2/conf-available
-# sudo a2enconf phpmyadmin
-# sudo systemctl restart apache2
-
-# Give a www-data ownership to www directory
-# echo -e "\n\n Ownership for /var/www\n"
-# sudo chown -R $(whoami):$(whoami) /var/www
-# echo -e "\n\n Ownership have been set\n"
-
 # Install Zip, Unzip, Git
 echo -e "\n\nInstalling Git, Zip, and Unzip\n"
 sudo apt update
@@ -117,41 +78,49 @@ sudo apt install zip unzip git
 echo -e "\n\nInstalling Composer\n"
 sudo apt update
 php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-php -r "if (hash_file('sha384', 'composer-setup.php') === 'e21205b207c3ff031906575712edab6f13eb0b361f2085f1f1237b7126d785e826a450292b6cfd1d64d92e6563bbde02') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
+php -r "if (hash_file('sha384', 'composer-setup.php') === 'dac665fdc30fdd8ec78b38b9800061b4150413ff2e3b6f88543c636f7cd84f6db9189d43a81e5503cda447da73c7e5b6') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
 php composer-setup.php
 sudo mv composer.phar /usr/local/bin/composer
 php -r "unlink('composer-setup.php');"
 
-# Install nodejs-20 as a user
-echo -e "\n\nInstalling nodejs 18\n"
+# Install nodejs through nvm
+echo -e "\n\Installing nodejs through nvm\n"
 sudo apt update
-sudo apt install -y ca-certificates curl gnupg
-sudo mkdir -p /etc/apt/keyrings
-curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
-NODE_MAJOR=20
-echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list
-sudo apt update
-sudo apt install nodejs -y
-node -v
-echo 'export PATH=$HOME/local/bin:$PATH' >> ~/.bashrc
+
+# Use curl or wget command
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+#OR
+wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+
+export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+
 source ~/.bashrc
+nvm --version  # Check nvm version
+nvm install node  # Will install latest node and npm 
+node -v  # Check node version
 
 # Install docker 
 echo -e "\n\nInstalling docker\n"
-sudo apt update
-sudo apt install ca-certificates curl gnupg lsb-release
+# Installing using the apt repository
+# Add Docker's official GPG key:
+sudo apt-get update
+sudo apt-get install ca-certificates curl
 sudo install -m 0755 -d /etc/apt/keyrings
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-sudo chmod a+r /etc/apt/keyrings/docker.gpg
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+# Add the repository to Apt sources:
 echo \
-  "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-  "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
   sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-sudo apt update
+sudo apt-get update
+
+# Install the Docker packages.
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
 sudo groupadd docker
-# sudo usermod -aG docker $(whoami)
-# sudo chown "$(whoami)":"$(whoami)" /home/"$(whoami)"/.docker -R
 sudo chmod g+rwx "$HOME/.docker" -R
 
 # Install VS code
