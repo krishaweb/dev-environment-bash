@@ -10,50 +10,30 @@ if [ "$(id -u)" != "0" ]; then
  exit 1
 fi
 
-# Update packages and upgrade pending packages.
-echo -e "\n\nUpdating apt packages and upgrading latest patches\n"
+# Update and upgrade packages.
+echo -e "\n\nUpdating and upgrading apt packages with latest patches\n"
 sudo apt update -y && sudo apt upgrade -y
+# Remove older or unused packages
+sudo apt autoremove -y
 
-# Install NGINX packages.
-echo -e "\n\nInstalling NGINX Packages\n"
+# Install NGINX webserver.
+echo -e "\n\nInstalling NGINX WebServer\n"
 sudo apt update
 sudo apt install nginx -y
 sudo ufw allow 'Nginx Full'
 # Allow 22 port to connect SSH
 sudo ufw allow 'OpenSSH'
-
-# Install MySQL-8.0.34 database & mysql-server
-sudo apt update
-sudo apt install mysql-server -y
-sudo systemctl start mysql.service
-# sudo mysql_secure_installation
-
-# Please use following command to set root password for the MYSQL.
-sudo mysql -u root -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH caching_sha2_password BY 'Root@1234'; FLUSH PRIVILEGES; exit;"
-# ALTER USER 'root'@'localhost' IDENTIFIED WITH caching_sha2_password BY 'Root@1234';
-# flush privileges;
-# exit;
-
-# Install PHP packages.
-echo -e "\n\nInstalling PHP & Requirements\n"
-sudo apt update
-sudo apt install php8.1-fpm php-mysql php-common php8.1-cli php8.1-common php8.1-opcache php8.1-readline php8.1-mbstring php8.1-xml php8.1-gd php8.1-curl -y
-sudo systemctl start php8.1-fpm
-
-# Install latest PhpMyAdmin
-echo -e "\n\nInstalling phpmyadmin\n"
-sudo apt update
-sudo apt install phpmyadmin -y
-sudo ln -s /usr/share/phpmyadmin /var/www/phpmyadmin
-sudo systemctl restart nginx
-
+sudo ufw allow ssh
+sudo systemctl start nginx
+sudo chown -R krish:krish /var/www/
+sudo chmod -R 755 /var/www/
+# Generate server block
 # Create server block for the nginx
-sudo touch /etc/nginx/sites-available/my_site
 echo "
 server {
     listen 80;
-    server_name your_domain www.your_domain;
-    root /var/www/your_domain;
+    server_name __;
+    root /var/www/;
 
     index index.html index.htm index.php;
 
@@ -70,12 +50,36 @@ server {
         deny all;
     }
 
-}" > my_site
-sudo mv my_site /etc/nginx/sites-available
-sudo ln -s /etc/nginx/sites-available/my_site /etc/nginx/sites-enabled/
+}" > localserver
+sudo mv localserver /etc/nginx/sites-available
+sudo ln -s /etc/nginx/sites-available/localserver /etc/nginx/sites-enabled/
 # Unlink default config
 # sudo unlink /etc/nginx/sites-enabled/default
 sudo systemctl reload nginx
+
+# Install MySQL-8.0.x database & mysql-server.
+sudo apt update
+sudo apt install mysql-server -y
+sudo systemctl start mysql.service
+# Please use following command to set root password for the MYSQL.
+# sudo mysql
+sudo mysql -u root -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'Root@1234'; FLUSH PRIVILEGES; EXIT;"
+# ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'Root@1234';
+# flush privileges;
+# exit;
+
+# Install PHP script.
+echo -e "\n\nInstalling PHP and it's extension\n"
+sudo apt update
+sudo apt install php8.1-fpm php-mysql php-common php8.1-cli php8.1-common php8.1-opcache php8.1-readline php8.1-mbstring php8.1-xml php8.1-gd php8.1-curl -y
+sudo systemctl start php8.1-fpm
+
+# Install latest PhpMyAdmin
+echo -e "\n\nInstalling phpmyadmin\n"
+sudo apt update
+sudo apt install phpmyadmin -y
+sudo ln -s /usr/share/phpmyadmin /var/www/phpmyadmin
+sudo systemctl restart nginx
 
 # Install postgres database.
 # sudo apt update
@@ -87,96 +91,63 @@ sudo systemctl reload nginx
 # exit;
 # sudo service postgresql restart
 
-# Give a www-data ownership to www directory
-# echo -e "\n\n Ownership for /var/www\n"
-# sudo chown -R $(whoami):$(whoami) /var/www
-# echo -e "\n\n Ownership have been set\n"
-
 ## Install MySql workbench.
 # echo -e "\n\nInstalling workbench\n"
 # sudo apt update
 # sudo snap install mysql-workbench-community
 
-# Install Zip, Unzip, Git
-echo -e "\n\nInstalling Git, Zip, and Unzip\n"
+# Install ZIP, Unzip, git
+echo -e "\n\nInstalling Git, ZIP, and Unzip\n"
 sudo apt update
-sudo apt install zip unzip git
+sudo apt install zip unzip git -y
 
 # Install composer
-echo -e "\n\nInstalling Composer\n"
+echo -e "\n\nInstalling Composer package\n"
 sudo apt update
 php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-php -r "if (hash_file('sha384', 'composer-setup.php') === 'e21205b207c3ff031906575712edab6f13eb0b361f2085f1f1237b7126d785e826a450292b6cfd1d64d92e6563bbde02') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
+php -r "if (hash_file('sha384', 'composer-setup.php') === 'dac665fdc30fdd8ec78b38b9800061b4150413ff2e3b6f88543c636f7cd84f6db9189d43a81e5503cda447da73c7e5b6') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
 php composer-setup.php
 sudo mv composer.phar /usr/local/bin/composer
 php -r "unlink('composer-setup.php');"
 
-# Install nodejs-20 as a user
-echo -e "\n\nInstalling nodejs 18\n"
+# Install nodejs through nvm
+echo -e "\n\Installing nodejs through nvm\n"
 sudo apt update
-sudo apt install -y ca-certificates curl gnupg
-sudo mkdir -p /etc/apt/keyrings
-curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
-NODE_MAJOR=20
-echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list
-sudo apt update
-sudo apt install nodejs -y
-node -v
-echo 'export PATH=$HOME/local/bin:$PATH' >> ~/.bashrc
+# Use curl or wget command
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
 source ~/.bashrc
-# sudo chown -R $(whoami) /usr/local/lib/nodejs/bin/npm
-
-# Install NVM to switch node version
-echo -e "\n\nInstalling nvm \n"
-sudo apt install curl
-curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash 
-source ~/.bashrc
-nvm install 18.16.0
-nvm use 18.16.0
+nvm --version  # Check nvm version
+nvm install node20  # Will install latest node and npm 
+node -v  # Check node version
 
 # Install docker 
 echo -e "\n\nInstalling docker\n"
-sudo apt update
-sudo apt install ca-certificates curl gnupg lsb-release
+# Installing using the apt repository
+# Add Docker's official GPG key:
+sudo apt-get update
+sudo apt-get install ca-certificates curl -y
 sudo install -m 0755 -d /etc/apt/keyrings
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-sudo chmod a+r /etc/apt/keyrings/docker.gpg
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+# Add the repository to Apt sources:
 echo \
-  "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-  "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
   sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-sudo apt update
-sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+sudo apt-get update
+# Install the Docker packages.
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
 sudo groupadd docker
-# sudo usermod -aG docker $(whoami)
-# sudo chown "$(whoami)":"$(whoami)" /home/"$(whoami)"/.docker -R
 sudo chmod g+rwx "$HOME/.docker" -R
-
-# Install VS code
-echo -e "\n\nInstalling VS code\n"
-sudo apt update
-wget -q https://packages.microsoft.com/keys/microsoft.asc -O- | sudo apt-key add -
-sudo add-apt-repository "deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main"
-sudo apt install code
-
-# Install Sublime Text editor 3
-echo -e "\n\nInstalling Sublime Text Editor\n"
-sudo apt update
-curl -fsSL https://download.sublimetext.com/sublimehq-pub.gpg | sudo apt-key add -
-sudo add-apt-repository "deb https://download.sublimetext.com/ apt/stable/"
-sudo apt update
-sudo apt install sublime-text
-
-# Install FileZilla
-echo -e "\n\nInstalling Sublime Text Editor\n"
-sudo apt update
-sudo apt install filezilla
 
 # Install PHP_CodeSniffer
 echo -e "\n\nInstalling PHP_CodeSniffer\n"
 composer global require "squizlabs/php_codesniffer=*"
 # first check if you already have composer's vendor bin directory as part of your path:
 echo 'export PATH=$HOME/.config/composer/vendor/bin:$PATH' >> ~/.bashrc
+echo 'export PATH=$HOME/.composer/vendor/bin:$PATH' >> ~/.bashrc
 source ~/.bashrc
 phpcs -i
 
@@ -184,14 +155,13 @@ phpcs -i
 echo -e "\n\nInstalling Dukto\n"
 sudo add-apt-repository ppa:xuzhen666/dukto
 sudo apt update
-sudo apt install dukto
+sudo apt install dukto -y
 
 # Install Brave
-echo -e "\n\nInstalling Brave\n"
-sudo apt install apt-transport-https curl
-curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
-echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg arch=amd64] https://brave-browser-apt-release.s3.brave.com/ stable main"|sudo tee /etc/apt/sources.list.d/brave-browser-release.list
+echo -e "\n\nInstalling Brave Browser\n"
+sudo curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg] https://brave-browser-apt-release.s3.brave.com/ stable main"|sudo tee /etc/apt/sources.list.d/brave-browser-release.list
 sudo apt update
-sudo apt install brave-browser
+sudo apt install brave-browser -y
 
 # done
