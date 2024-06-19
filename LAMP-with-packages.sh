@@ -68,7 +68,7 @@ sudo apt install phpmyadmin -y
 sudo phpenmod mbstring
 sudo systemctl restart apache2
 ## Configure PhpMyAdmin
-echo 'Include /etc/phpmyadmin/apache.conf' >> /etc/apache2/apache2.conf
+sudo bash -c 'echo "Include /etc/phpmyadmin/apache.conf" >> /etc/apache2/apache2.conf'
 
 # Install ZIP, Unzip, git
 echo -e "\n\nInstalling Git, ZIP, and Unzip\n"
