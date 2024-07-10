@@ -92,11 +92,12 @@ php -r "unlink('composer-setup.php');"
 # Install nodejs through nvm
 echo -e "\n\Installing nodejs through nvm\n"
 sudo apt update
+sudo apt install curl -y
 # Use curl or wget command
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
-source ~/.bashrc
+. ~/.bashrc
 nvm --version  # Check nvm version
 nvm install node20  # Will install latest node and npm 
 node -v  # Check node version
@@ -127,7 +128,7 @@ composer global require "squizlabs/php_codesniffer=*"
 # first check if you already have composer's vendor bin directory as part of your path:
 echo 'export PATH=$HOME/.config/composer/vendor/bin:$PATH' >> ~/.bashrc
 echo 'export PATH=$HOME/.composer/vendor/bin:$PATH' >> ~/.bashrc
-source ~/.bashrc
+. ~/.bashrc
 phpcs -i
 
 # Install Dukto
